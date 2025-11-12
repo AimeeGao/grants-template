@@ -1,0 +1,21 @@
+# Git
+.git
+.gitignore
+ 
+# Environment files
+.env
+.env*
+ 
+# Dependencies
+vendor/
+node_modules/
+ 
+# Laravel runtime files
+storage/
+bootstrap/cache/
+ 
+# OS & IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

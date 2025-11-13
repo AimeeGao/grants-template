@@ -4,10 +4,9 @@ services:
     container_name: grants-template-app
     ports:
       - "8080:80"
+    restart: always
     volumes:
       - ./:/var/www/html
-      - storage_data:/var/www/html/storage
-      - cache_data:/var/www/html/bootstrap/cache
     depends_on:
       - db
     environment:
@@ -17,6 +16,8 @@ services:
       DB_DATABASE: grants-template
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
+    expose:
+      - "8080"
  
   db:
     image: postgres:16.10
@@ -29,9 +30,8 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data/
  
 volumes:
   pgdata:
-  storage_data:
-  cache_data:
+    driver: local

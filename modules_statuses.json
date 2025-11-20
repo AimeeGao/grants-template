@@ -1,3 +1,5 @@
 {
-    "Ministry": true
+    "Ministry": true,
+    "Institution": true,
+    "Student": true
 }

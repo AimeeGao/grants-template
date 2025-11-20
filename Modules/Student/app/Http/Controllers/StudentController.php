@@ -1,18 +1,18 @@
 <?php
 
-namespace Modules\Ministry\Http\Controllers;
+namespace Modules\Student\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class MinistryController extends Controller
+class StudentController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view('ministry::index');
+        return view('student::index');
     }
 
     /**
@@ -20,7 +20,7 @@ class MinistryController extends Controller
      */
     public function create()
     {
-        return view('ministry::create');
+        return view('student::create');
     }
 
     /**
@@ -33,7 +33,7 @@ class MinistryController extends Controller
      */
     public function show($id)
     {
-        return view('ministry::show');
+        return view('student::show');
     }
 
     /**
@@ -41,7 +41,7 @@ class MinistryController extends Controller
      */
     public function edit($id)
     {
-        return view('ministry::edit');
+        return view('student::edit');
     }
 
     /**

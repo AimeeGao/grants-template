@@ -4,5 +4,5 @@ use Illuminate\Support\Facades\Route;
 use Modules\Ministry\Http\Controllers\MinistryController;
 
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
-    Route::apiResource('ministries', MinistryController::class)->names('ministry');
+    Route::apiResource('ministry', MinistryController::class)->names('ministry');
 });

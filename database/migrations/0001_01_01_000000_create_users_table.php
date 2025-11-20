@@ -13,12 +13,37 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->uuid('guid')->index()->unique();
+            $table->string('first_name');
+            $table->string('last_name');
+            $table->string('name')->nullable();
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('password')->nullable(); // Made nullable for SSO
+
+            $table->string('idir_username', 60)->nullable();
+            $table->string('bcsc_username', 60)->nullable();
+            $table->string('bceid_username', 60)->nullable();
+            $table->uuid('idir_user_guid')->index()->nullable();
+            $table->uuid('bcsc_user_guid')->index()->nullable();
+            $table->uuid('bceid_user_guid')->index()->nullable();
+            $table->uuid('bceid_business_guid')->index()->nullable();
+            $table->uuid('last_touch_by_user_guid')->index()->nullable();
+            $table->string('keycloak_id')->index()->nullable();
+            $table->string('identity_provider')->index()->nullable();
+
+            // Display information
+            $table->string('display_name')->nullable();
+            $table->string('given_name')->nullable();
+            $table->string('family_name')->nullable();
+            $table->string('organization')->nullable();
+            $table->boolean('is_active')->default(true)->index();
+            $table->text('kc_token')->nullable();
+            $table->text('kc_refresh_token')->nullable();
+
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
+            $table->unique(['guid', 'keycloak_id']);
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

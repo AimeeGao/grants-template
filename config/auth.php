@@ -112,4 +112,23 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Keycloak Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for Keycloak SSO integration.
+    | These values should be set in your .env file.
+    |
+    */
+
+    'keycloak' => [
+        'auth_server_url' => env('KEYCLOAK_AUTH_SERVER_URL'),
+        'realm' => env('KEYCLOAK_REALM'),
+        'client_id' => env('KEYCLOAK_CLIENT_ID'),
+        'client_secret' => env('KEYCLOAK_CLIENT_SECRET'),
+        'redirect_uri' => env('KEYCLOAK_REDIRECT_URI', env('APP_URL') . '/auth/keycloak/callback'),
+        'admin_redirect_uri' => env('KEYCLOAK_ADMIN_REDIRECT_URI', env('APP_URL') . '/auth/keycloak/admin/callback'),
+    ],
+
 ];

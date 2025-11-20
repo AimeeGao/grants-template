@@ -1,7 +1,5 @@
-@extends('ministry::layouts.master')
-
-@section('content')
+<x-ministry::layouts.master>
     <h1>Hello World</h1>
 
     <p>Module: {!! config('ministry.name') !!}</p>
-@endsection
+</x-ministry::layouts.master>

@@ -9,5 +9,5 @@
 </template>
  
 <script setup>
-  const appName = 'Laravel';
+  const appName = 'Grants Template';
 </script>

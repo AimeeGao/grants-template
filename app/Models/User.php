@@ -75,13 +75,12 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the individual profile for the user.
+     * Get the student profile associated with the user.
      */
-    // TODO: Uncomment and implement when Individual model is available
-    // public function individual(): HasOne
-    // {
-    //     return $this->hasOne(Individual::class, 'user_guid', 'guid');
-    // }
+    public function student(): HasOne
+    {
+        return $this->hasOne(Student::class, 'user_guid', 'guid');
+    }
 
     /**
      * Check if user has a specific role.

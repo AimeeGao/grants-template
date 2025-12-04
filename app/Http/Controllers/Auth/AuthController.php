@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Student;
 use App\Models\User;
 use App\Models\Role;
 use Illuminate\Http\RedirectResponse;
@@ -375,16 +376,23 @@ class AuthController extends Controller
             ]);
         }
 
-        Auth::logout($user);
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        $request->session()->flush(); // Clear all session data
+        $this->invalidateSession($request);
 
         return redirect('/login')->with('message', 'You have been logged out successfully.');
     }
 
     // TODO: Implement SSO logout when .env variables are confirmed
     
+    /**
+     * Log the user out and invalidate the session.
+     */
+    private function invalidateSession(Request $request): void
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        $request->session()->flush(); // Clear all session data
+    }
 
     /**
      * Redirect to appropriate dashboard based on user roles and IDP type.
@@ -411,6 +419,17 @@ class AuthController extends Controller
 
         // BCSC users (students)
         if ($user->hasRole(Role::STUDENT) || !empty($user->bcsc_user_guid)) {
+
+            $student = Student::withTrashed()->where('user_guid', $user->guid)->first();
+            if ($student && $student->trashed()) {
+                
+                $this->invalidateSession(request());
+
+                return redirect()->route('login')->withErrors([
+                    'error' => 'Could not access dashboard. Please contact an administrator to reactivate it'
+                ]);
+            }
+
             return redirect()->route('student.dashboard');
         }
 

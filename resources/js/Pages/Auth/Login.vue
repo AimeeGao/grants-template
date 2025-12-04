@@ -3,6 +3,18 @@
     <div class="card shadow-sm" style="min-width: 360px;">
       <div class="card-body text-center">
         <h1 class="h4 mb-3">Welcome back</h1>
+        
+        <div v-if="$page.props.errors && $page.props.errors.error" class="alert alert-danger mb-4">
+          {{ $page.props.errors.error }}
+        </div>
+
+        <div v-if="status" class="alert alert-success mb-4">
+          {{ status }}
+        </div>
+        <div v-if="$page.props.flash && $page.props.flash.success" class="alert alert-success mb-4">
+          {{ $page.props.flash.success }}
+        </div>
+
         <p class="text-muted mb-4">
           Sign in with one of the identity providers to continue.
         </p>
@@ -15,3 +27,9 @@
     </div>
   </div>
 </template>
+
+<script setup>
+defineProps({
+    status: String,
+});
+</script>

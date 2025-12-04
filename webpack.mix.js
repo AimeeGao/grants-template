@@ -29,7 +29,7 @@ fs.readdirSync(modulesPath).forEach(moduleName => {
  */
 
 mix.js('resources/js/app.js', 'public/js')
-//    .copyDirectory('resources/images', 'public/images')
+   .copyDirectory('resources/images', 'public/images')
 //    .copyDirectory('resources/fonts', 'public/fonts')
 
     .vue()

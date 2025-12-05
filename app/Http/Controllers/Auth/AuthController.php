@@ -304,9 +304,9 @@ class AuthController extends Controller
                 break;
 
             case 'bceid':
-                $user->bceid_user_guid = $providerUser['bceid_user_guid'] ?? null;
+                $user->bceid_user_guid = $this->normalizeGuid($providerUser['bceid_user_guid'] ?? null);
                 $user->bceid_username = $providerUser['bceid_username'] ?? null;
-                $user->bceid_business_guid = $providerUser['bceid_business_guid'] ?? null;
+                $user->bceid_business_guid = $this->normalizeGuid($providerUser['bceid_business_guid'] ?? null);
                 $user->organization = Str::upper($providerUser['bceid_business_name'] ?? '');
                 break;
         }
@@ -472,5 +472,22 @@ class AuthController extends Controller
         // Default dashboard for other cases
         return redirect()->route('login')
             ->withErrors(['error' => 'Could not access dashboard. Please contact an administrator. Error #0082940']);
+    }
+
+    /**
+     * Normalize GUID format to uppercase without hyphens.
+     * This ensures consistent GUID format across all identity providers.
+     *
+     * @param string|null $guid The GUID to normalize
+     * @return string|null The normalized GUID (uppercase, no hyphens) or null
+     */
+    private function normalizeGuid(?string $guid): ?string
+    {
+        if (empty($guid)) {
+            return null;
+        }
+
+        // Remove hyphens and convert to uppercase
+        return strtoupper(str_replace('-', '', $guid));
     }
 }

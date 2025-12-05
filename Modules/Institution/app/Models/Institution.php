@@ -24,26 +24,24 @@ class Institution extends Model
      * @var array<string>
      */
     protected $fillable = [
+        'guid',
         'bceid_business_guid',
+        'dli',
         'name',
-        'display_name',
-        'institution_type',
-        'dli_number',
-        'primary_contact_email',
-        'primary_contact_phone',
-        'address_line_1',
-        'address_line_2',
+        'name_code',
+        'size',
+        'category',
+        'economic_region',
+        'legal_name',
+        'address1',
+        'address2',
+        'primary_contact',
+        'primary_email',
         'city',
-        'province',
         'postal_code',
-        'country',
-        'website',
-        'is_active',
-        'status',
-        'attestation_quota_total',
-        'attestation_quota_grad',
-        'attestation_quota_undergrad',
-        'notes',
+        'province',
+        'active_status',
+        'last_touch_by_user_guid',
     ];
 
     /**
@@ -53,10 +51,7 @@ class Institution extends Model
      */
     protected $casts = [
         'bceid_business_guid' => 'string',
-        'is_active' => 'boolean',
-        'attestation_quota_total' => 'integer',
-        'attestation_quota_grad' => 'integer',
-        'attestation_quota_undergrad' => 'integer',
+        'active_status' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
@@ -81,12 +76,11 @@ class Institution extends Model
     public function getFullAddressAttribute(): string
     {
         $parts = array_filter([
-            $this->address_line_1,
-            $this->address_line_2,
+            $this->address1,
+            $this->address2,
             $this->city,
             $this->province,
             $this->postal_code,
-            $this->country,
         ]);
 
         return implode(', ', $parts);
@@ -112,7 +106,7 @@ class Institution extends Model
      */
     public function scopeActive($query)
     {
-        return $query->where('is_active', true);
+        return $query->where('active_status', true);
     }
 
     /**

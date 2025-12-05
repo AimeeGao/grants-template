@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Student;
 use App\Models\User;
 use App\Models\Role;
+use Modules\Institution\Models\Institution;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -312,6 +313,11 @@ class AuthController extends Controller
 
         $user->save();
 
+        // Auto-create institution for BCeID users
+        if ($idpType === 'bceid' && !empty($user->bceid_business_guid)) {
+            $this->ensureInstitutionExists($user->bceid_business_guid, $user->organization);
+        }
+
         // Assign default role based on IDP type
         $this->assignDefaultRole($user, $idpType);
 
@@ -359,6 +365,36 @@ class AuthController extends Controller
                     $user->save();
                 }
             }
+        }
+    }
+
+    /**
+     * Ensure institution record exists for BCeID business.
+     * Auto-creates institution from BCeID data during login.
+     */
+    private function ensureInstitutionExists(string $bceidBusinessGuid, string $organizationName): void
+    {
+        $institution = Institution::firstOrCreate(
+            ['bceid_business_guid' => $bceidBusinessGuid],
+            [
+                'guid' => str_replace('-', '', \Illuminate\Support\Str::uuid()),
+                'name' => $organizationName,
+                'name_code' => strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $organizationName), 0, 5)),
+                'legal_name' => $organizationName,
+                'active_status' => true,
+                'category' => 'public',
+                'province' => 'BC',
+                'city' => 'Unknown',
+                'postal_code' => 'V0V0V0',
+            ]
+        );
+
+        if ($institution->wasRecentlyCreated) {
+            Log::info('Institution auto-created from BCeID login', [
+                'institution_id' => $institution->id,
+                'bceid_business_guid' => $bceidBusinessGuid,
+                'name' => $organizationName,
+            ]);
         }
     }
 

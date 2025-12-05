@@ -2,104 +2,22 @@
     <Head title="Dashboard" />
 
     <AuthenticatedLayout v-bind="$attrs">
-        <div class="container py-4">
-            <!-- Institution Name and Welcome -->
-            <div class="row mb-4">
-                <div class="col-12">
-                    <h1 class="display-6 mb-2">{{ institutionName }}</h1>
-                    <p class="text-muted">Welcome {{ $attrs.auth.user.first_name }} {{ $attrs.auth.user.last_name }}</p>
-                </div>
-            </div>
-
-            <!-- Top Row: Total, Reserved, Available Attestations -->
-            <div class="row mb-3">
-                <div class="col-md-4 mb-3">
-                    <div class="card">
-                        <div class="card-header bg-white border-bottom text-center">
-                            <h6 class="mb-0">Total Attestations Available</h6>
-                        </div>
-                        <div class="card-body text-center py-5">
-                            <div class="display-4">{{ totalAttestations }}</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="card">
-                        <div class="card-header bg-white border-bottom text-center">
-                            <h6 class="mb-0">Reserved Grad. Attestations</h6>
-                        </div>
-                        <div class="card-body text-center py-5">
-                            <div class="display-4">{{ reservedGradAttestations }}</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="card">
-                        <div class="card-header bg-white border-bottom text-center">
-                            <h6 class="mb-0">Available Attestations</h6>
-                        </div>
-                        <div class="card-body text-center py-5">
-                            <div class="display-4">{{ availableAttestations }}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Bottom Row: Grad, Undergrad, Remaining -->
+        <div class="container-fluid py-4">
             <div class="row">
-                <div class="col-md-4 mb-3">
-                    <div class="card">
-                        <div class="card-header bg-white border-bottom text-center">
-                            <h6 class="mb-0">Grad. Attestations</h6>
-                        </div>
-                        <div class="card-body py-4">
-                            <div class="row text-center">
-                                <div class="col-6">
-                                    <small class="d-block text-muted mb-2">Issued</small>
-                                    <div class="h2">{{ gradIssued }}</div>
-                                </div>
-                                <div class="col-6">
-                                    <small class="d-block text-muted mb-2">Declined</small>
-                                    <div class="h2">{{ gradDeclined }}</div>
-                                </div>
-                            </div>
-                            <div class="mt-3 text-center">
-                                <small class="text-muted">* For more information on Declined PALs see FAQ</small>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Left Sidebar: Menu -->
+                <div class="col-12 col-md-3 col-lg-2">
+                    <DashboardMenu
+                        :active-page="currentPage"
+                        @navigate="navigateTo"
+                    />
                 </div>
-                <div class="col-md-4 mb-3">
-                    <div class="card">
-                        <div class="card-header bg-white border-bottom text-center">
-                            <h6 class="mb-0">Undergrad. Attestations</h6>
-                        </div>
-                        <div class="card-body py-4">
-                            <div class="row text-center">
-                                <div class="col-6">
-                                    <small class="d-block text-muted mb-2">Issued</small>
-                                    <div class="h2">{{ undergradIssued }}</div>
-                                </div>
-                                <div class="col-6">
-                                    <small class="d-block text-muted mb-2">Declined</small>
-                                    <div class="h2">{{ undergradDeclined }}</div>
-                                </div>
-                            </div>
-                            <div class="mt-3 text-center">
-                                <small class="text-muted">* For more information on Declined PALs see FAQ</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="card">
-                        <div class="card-header bg-white border-bottom text-center">
-                            <h6 class="mb-0">Remaining Undergrad. Attestations</h6>
-                        </div>
-                        <div class="card-body text-center py-5">
-                            <div class="display-4">{{ remainingUndergradAttestations }}</div>
-                        </div>
-                    </div>
+
+                <!-- Right: Main Content Area -->
+                <div class="col-12 col-md-9 col-lg-10">
+                    <component
+                        :is="currentComponent"
+                        v-bind="currentProps"
+                    />
                 </div>
             </div>
         </div>
@@ -107,52 +25,157 @@
 </template>
 
 <script>
+import { ref, computed } from 'vue';
 import AuthenticatedLayout from '../Layouts/Authenticated.vue';
 import { Head } from '@inertiajs/vue3';
+import DashboardMenu from '../Components/DashboardMenu.vue';
+import DashboardOverview from '../Components/DashboardOverview.vue';
+import InstitutionProfile from '../Components/InstitutionProfile.vue';
+import ApplicationList from '../Components/ApplicationList.vue';
+import AttestationList from '../Components/AttestationList.vue';
+import ReportsList from '../Components/ReportsList.vue';
 
 export default {
     name: 'Dashboard',
     components: {
         AuthenticatedLayout,
-        Head
+        Head,
+        DashboardMenu,
+        DashboardOverview,
+        InstitutionProfile,
+        ApplicationList,
+        AttestationList,
+        ReportsList,
     },
     props: {
         institutionName: {
             type: String,
-            default: 'College A Victoria'
+            default: 'Unknown Institution'
         },
-        totalAttestations: {
-            type: Number,
-            default: 0
+        institution: {
+            type: Object,
+            default: null
         },
-        reservedGradAttestations: {
-            type: Number,
-            default: 0
+        attestationData: {
+            type: Object,
+            default: () => ({
+                totalAttestations: 0,
+                reservedGradAttestations: 0,
+                availableAttestations: 0,
+                gradIssued: 0,
+                gradDeclined: 0,
+                undergradIssued: 0,
+                undergradDeclined: 0,
+                remainingUndergradAttestations: 0,
+            })
         },
-        availableAttestations: {
-            type: Number,
-            default: 0
+        canEdit: {
+            type: Boolean,
+            default: false
         },
-        gradIssued: {
-            type: Number,
-            default: 0
+        applications: {
+            type: Object,
+            default: null
         },
-        gradDeclined: {
-            type: Number,
-            default: 0
+        applicationStats: {
+            type: Object,
+            default: null
         },
-        undergradIssued: {
-            type: Number,
-            default: 0
+        filters: {
+            type: Object,
+            default: null
         },
-        undergradDeclined: {
-            type: Number,
-            default: 0
+        attestations: {
+            type: Object,
+            default: null
         },
-        remainingUndergradAttestations: {
-            type: Number,
-            default: 0
+        attestationStats: {
+            type: Object,
+            default: null
+        },
+        reportData: {
+            type: Object,
+            default: null
         }
+    },
+    setup(props, { attrs }) {
+        const currentPage = ref('dashboard');
+
+        const navigateTo = (page) => {
+            currentPage.value = page;
+        };
+
+        const currentComponent = computed(() => {
+            switch (currentPage.value) {
+                case 'dashboard':
+                    return 'DashboardOverview';
+                case 'profile':
+                    return 'InstitutionProfile';
+                case 'applications':
+                    return 'ApplicationList';
+                case 'attestations':
+                    return 'AttestationList';
+                case 'reports':
+                    return 'ReportsList';
+                default:
+                    return 'DashboardOverview';
+            }
+        });
+
+        const currentProps = computed(() => {
+            const userName = attrs.auth?.user
+                ? `${attrs.auth.user.first_name} ${attrs.auth.user.last_name}`
+                : 'User';
+
+            switch (currentPage.value) {
+                case 'dashboard':
+                    return {
+                        institutionName: props.institutionName,
+                        userName: userName,
+                        attestationData: props.attestationData,
+                    };
+                case 'profile':
+                    return {
+                        institution: props.institution,
+                        canEdit: props.canEdit,
+                    };
+                case 'applications':
+                    return {
+                        applications: props.applications,
+                        applicationStats: props.applicationStats,
+                        filters: props.filters,
+                        canEdit: props.canEdit,
+                    };
+                case 'attestations':
+                    return {
+                        attestations: props.attestations,
+                        attestationStats: props.attestationStats,
+                        filters: props.filters,
+                        canEdit: props.canEdit,
+                    };
+                case 'reports':
+                    return {
+                        reportData: props.reportData,
+                        filters: props.filters,
+                    };
+                default:
+                    return {};
+            }
+        });
+
+        return {
+            currentPage,
+            navigateTo,
+            currentComponent,
+            currentProps,
+        };
     }
 }
 </script>
+
+<style scoped>
+/* Ensure full width for dashboard container */
+.container-fluid {
+    max-width: 100%;
+}
+</style>

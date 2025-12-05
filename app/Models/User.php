@@ -125,14 +125,13 @@ class User extends Authenticatable
     /**
      * Get the institution associated with this user (for BCeID users).
      */
-    // TODO: Uncomment and implement when Institution model is available
-    // public function institution()
-    // {
-    //     if ($this->identity_provider === 'bceid' && $this->bceid_business_guid) {
-    //         return Institution::where('bceid_business_guid', $this->bceid_business_guid)->first();
-    //     }
-    //     return null;
-    // }
+    public function institution()
+    {
+        if ($this->identity_provider === 'bceid' && $this->bceid_business_guid) {
+            return \Modules\Institution\Models\Institution::where('bceid_business_guid', $this->bceid_business_guid)->first();
+        }
+        return null;
+    }
 
     /**
      * Get user's identity provider display name.

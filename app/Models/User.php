@@ -128,7 +128,7 @@ class User extends Authenticatable
     public function institution()
     {
         if ($this->identity_provider === 'bceid' && $this->bceid_business_guid) {
-            return \Modules\Institution\Models\Institution::where('bceid_business_guid', $this->bceid_business_guid)->first();
+            return Institution::where('bceid_business_guid', $this->bceid_business_guid)->first();
         }
         return null;
     }

@@ -24,19 +24,19 @@ Route::prefix('institution')->group(function () {
             Route::get('/profile', [InstitutionController::class, 'profile'])->name('profile');
             Route::put('/profile', [InstitutionController::class, 'updateProfile'])->name('profile.update');
 
-            // Application routes
-            Route::get('/applications', [InstitutionController::class, 'applications'])->name('applications');
-            Route::get('/applications/{id}', [InstitutionController::class, 'viewApplication'])->name('applications.view');
-            Route::put('/applications/{id}/review', [InstitutionController::class, 'reviewApplication'])->name('applications.review');
+            // TODO: Implement applications feature
+            // Route::get('/applications', [InstitutionController::class, 'applications'])->name('applications');
+            // Route::get('/applications/{id}', [InstitutionController::class, 'viewApplication'])->name('applications.view');
+            // Route::put('/applications/{id}/review', [InstitutionController::class, 'reviewApplication'])->name('applications.review');
 
-            // Attestation routes
-            Route::get('/attestations', [InstitutionController::class, 'attestations'])->name('attestations');
-            Route::get('/attestations/{id}', [InstitutionController::class, 'viewAttestation'])->name('attestations.view');
-            Route::put('/attestations/{id}/revoke', [InstitutionController::class, 'revokeAttestation'])->name('attestations.revoke');
+            // TODO: Implement attestations feature
+            // Route::get('/attestations', [InstitutionController::class, 'attestations'])->name('attestations');
+            // Route::get('/attestations/{id}', [InstitutionController::class, 'viewAttestation'])->name('attestations.view');
+            // Route::put('/attestations/{id}/revoke', [InstitutionController::class, 'revokeAttestation'])->name('attestations.revoke');
 
-            // Report routes
-            Route::get('/reports', [InstitutionController::class, 'reports'])->name('reports');
-            Route::get('/reports/export/{type}', [InstitutionController::class, 'exportReport'])->name('reports.export');
+            // TODO: Implement reports feature
+            // Route::get('/reports', [InstitutionController::class, 'reports'])->name('reports');
+            // Route::get('/reports/export/{type}', [InstitutionController::class, 'exportReport'])->name('reports.export');
     });
 
 });

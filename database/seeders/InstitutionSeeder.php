@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Modules\Institution\Models\Institution;
+use App\Models\Institution;
 use Illuminate\Support\Str;
 
 class InstitutionSeeder extends Seeder

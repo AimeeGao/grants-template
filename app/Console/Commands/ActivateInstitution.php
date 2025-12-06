@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Modules\Institution\Models\Institution;
+use App\Models\Institution;
 
 class ActivateInstitution extends Command
 {

@@ -1,11 +1,10 @@
 <?php
 
-namespace Modules\Institution\Models;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\User;
 
 class Institution extends Model
 {
@@ -21,41 +20,18 @@ class Institution extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<string>
+     * @var array<int, string>
      */
-    protected $fillable = [
-        'guid',
-        'bceid_business_guid',
-        'dli',
-        'name',
-        'name_code',
-        'size',
-        'category',
-        'economic_region',
-        'legal_name',
-        'address1',
-        'address2',
-        'primary_contact',
-        'primary_email',
-        'city',
-        'postal_code',
-        'province',
-        'active_status',
-        'last_touch_by_user_guid',
-    ];
+    protected $fillable = ['guid', 'name', 'legal_name', 'address1', 'address2', 'primary_contact', 'category',
+        'primary_email', 'city', 'postal_code', 'province', 'active_status', 'standing_status',
+        'bceid_business_guid', 'last_touch_by_user_guid', 'economic_region', ];
 
     /**
-     * The attributes that should be cast.
+     * The attributes that should be hidden for serialization.
      *
-     * @var array<string, string>
+     * @var array<int, string>
      */
-    protected $casts = [
-        'bceid_business_guid' => 'string',
-        'active_status' => 'boolean',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
-    ];
+    protected $hidden = ['last_touch_by_user_guid'];
 
     /**
      * Get all users associated with this institution.
@@ -84,18 +60,6 @@ class Institution extends Model
         ]);
 
         return implode(', ', $parts);
-    }
-
-    /**
-     * Check if institution has available attestation quota.
-     *
-     * @param string $type 'grad', 'undergrad', or 'total'
-     * @return bool
-     */
-    public function hasAvailableQuota(string $type = 'total'): bool
-    {
-        $field = "attestation_quota_{$type}";
-        return isset($this->$field) && $this->$field > 0;
     }
 
     /**

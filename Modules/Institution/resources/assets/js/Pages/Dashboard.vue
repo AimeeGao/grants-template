@@ -1,181 +1,59 @@
 <template>
-    <Head title="Dashboard" />
+    <Head title="Institution Dashboard" />
 
     <AuthenticatedLayout v-bind="$attrs">
-        <div class="container-fluid py-4">
+        <template #header>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                Institution Dashboard
+            </h2>
+        </template>
+
+        <div class="container-fluid py-12">
             <div class="row">
-                <!-- Left Sidebar: Menu -->
-                <div class="col-12 col-md-3 col-lg-2">
-                    <DashboardMenu
-                        :active-page="currentPage"
-                        @navigate="navigateTo"
-                    />
+                <div class="col-md-3 mb-3">
+                    <div class="card">
+                        <div class="card-header">
+                            Institution Menu
+                        </div>
+                        <div class="card-body p-0">
+                            <DashboardMenu :page="page" />
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Right: Main Content Area -->
-                <div class="col-12 col-md-9 col-lg-10">
-                    <component
-                        :is="currentComponent"
-                        v-bind="currentProps"
+                <div class="col-md-9 mb-3">
+
+                    <InstitutionProfile
+                        v-if="page === 'profile'"
+                        :institution="institution"
+                        :canEdit="canEdit"
                     />
+
+                    <div v-if="page === 'dashboard'" class="card">
+                        <div class="card-header">Dashboard Overview</div>
+                        <div class="card-body">
+                            <h4>Welcome to {{ institutionName }}</h4>
+                            <p class="text-muted">This is your institution dashboard. Use the menu to navigate.</p>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
+
     </AuthenticatedLayout>
 </template>
 
-<script>
-import { ref, computed } from 'vue';
+<script setup>
 import AuthenticatedLayout from '../Layouts/Authenticated.vue';
 import { Head } from '@inertiajs/vue3';
 import DashboardMenu from '../Components/DashboardMenu.vue';
-import DashboardOverview from '../Components/DashboardOverview.vue';
 import InstitutionProfile from '../Components/InstitutionProfile.vue';
-import ApplicationList from '../Components/ApplicationList.vue';
-import AttestationList from '../Components/AttestationList.vue';
-import ReportsList from '../Components/ReportsList.vue';
 
-export default {
-    name: 'Dashboard',
-    components: {
-        AuthenticatedLayout,
-        Head,
-        DashboardMenu,
-        DashboardOverview,
-        InstitutionProfile,
-        ApplicationList,
-        AttestationList,
-        ReportsList,
-    },
-    props: {
-        institutionName: {
-            type: String,
-            default: 'Unknown Institution'
-        },
-        institution: {
-            type: Object,
-            default: null
-        },
-        attestationData: {
-            type: Object,
-            default: () => ({
-                totalAttestations: 0,
-                reservedGradAttestations: 0,
-                availableAttestations: 0,
-                gradIssued: 0,
-                gradDeclined: 0,
-                undergradIssued: 0,
-                undergradDeclined: 0,
-                remainingUndergradAttestations: 0,
-            })
-        },
-        canEdit: {
-            type: Boolean,
-            default: false
-        },
-        applications: {
-            type: Object,
-            default: null
-        },
-        applicationStats: {
-            type: Object,
-            default: null
-        },
-        filters: {
-            type: Object,
-            default: null
-        },
-        attestations: {
-            type: Object,
-            default: null
-        },
-        attestationStats: {
-            type: Object,
-            default: null
-        },
-        reportData: {
-            type: Object,
-            default: null
-        }
-    },
-    setup(props, { attrs }) {
-        const currentPage = ref('dashboard');
-
-        const navigateTo = (page) => {
-            currentPage.value = page;
-        };
-
-        const currentComponent = computed(() => {
-            switch (currentPage.value) {
-                case 'dashboard':
-                    return 'DashboardOverview';
-                case 'profile':
-                    return 'InstitutionProfile';
-                case 'applications':
-                    return 'ApplicationList';
-                case 'attestations':
-                    return 'AttestationList';
-                case 'reports':
-                    return 'ReportsList';
-                default:
-                    return 'DashboardOverview';
-            }
-        });
-
-        const currentProps = computed(() => {
-            const userName = attrs.auth?.user
-                ? `${attrs.auth.user.first_name} ${attrs.auth.user.last_name}`
-                : 'User';
-
-            switch (currentPage.value) {
-                case 'dashboard':
-                    return {
-                        institutionName: props.institutionName,
-                        userName: userName,
-                        attestationData: props.attestationData,
-                    };
-                case 'profile':
-                    return {
-                        institution: props.institution,
-                        canEdit: props.canEdit,
-                    };
-                case 'applications':
-                    return {
-                        applications: props.applications,
-                        applicationStats: props.applicationStats,
-                        filters: props.filters,
-                        canEdit: props.canEdit,
-                    };
-                case 'attestations':
-                    return {
-                        attestations: props.attestations,
-                        attestationStats: props.attestationStats,
-                        filters: props.filters,
-                        canEdit: props.canEdit,
-                    };
-                case 'reports':
-                    return {
-                        reportData: props.reportData,
-                        filters: props.filters,
-                    };
-                default:
-                    return {};
-            }
-        });
-
-        return {
-            currentPage,
-            navigateTo,
-            currentComponent,
-            currentProps,
-        };
-    }
-}
+defineProps({
+    page: String,
+    institution: Object,
+    institutionName: String,
+    canEdit: Boolean,
+});
 </script>
-
-<style scoped>
-/* Ensure full width for dashboard container */
-.container-fluid {
-    max-width: 100%;
-}
-</style>

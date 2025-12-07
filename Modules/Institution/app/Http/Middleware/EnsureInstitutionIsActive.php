@@ -24,7 +24,7 @@ class EnsureInstitutionIsActive
         }
 
         // Get institution relationship
-        $institution = $user->institution();
+        $institution = $user->institution;
 
         // Check if user has an institution
         if (!$institution) {

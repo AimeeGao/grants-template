@@ -16,7 +16,7 @@
                     Dashboard
                 </Link>
                 <Link
-                    :href="route('institution.profile')"
+                    :href="route('institution.profile.index')"
                     class="nav-link"
                     :class="{ active: $page.url === '/institution/profile' }"
                 >

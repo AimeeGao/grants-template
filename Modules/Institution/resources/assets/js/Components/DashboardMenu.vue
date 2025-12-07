@@ -1,69 +1,66 @@
 <template>
     <div class="dashboard-menu">
-        <h5 class="menu-title mb-3">Institution Menu</h5>
         <div class="list-group">
-            <button
-                type="button"
+            <Link
+                :href="route('institution.dashboard')"
                 class="list-group-item list-group-item-action"
-                :class="{ active: activePage === 'dashboard' }"
-                @click="$emit('navigate', 'dashboard')"
+                :class="{ active: page === 'dashboard' }"
             >
                 <i class="bi bi-speedometer2 me-2"></i>
                 Dashboard
-            </button>
+            </Link>
 
-            <button
-                type="button"
+            <Link
+                :href="route('institution.profile.index')"
                 class="list-group-item list-group-item-action"
-                :class="{ active: activePage === 'profile' }"
-                @click="$emit('navigate', 'profile')"
+                :class="{ active: page === 'profile' }"
             >
                 <i class="bi bi-building me-2"></i>
                 Institution Profile
-            </button>
+            </Link>
 
-            <button
-                type="button"
+            <!-- TODO: Implement applications feature -->
+            <!-- <Link
+                :href="route('institution.applications')"
                 class="list-group-item list-group-item-action"
-                :class="{ active: activePage === 'applications' }"
-                @click="$emit('navigate', 'applications')"
+                :class="{ active: page === 'applications' }"
             >
                 <i class="bi bi-file-earmark-text me-2"></i>
                 Applications
-            </button>
+            </Link> -->
 
-            <button
-                type="button"
+            <!-- TODO: Implement attestations feature -->
+            <!-- <Link
+                :href="route('institution.attestations')"
                 class="list-group-item list-group-item-action"
-                :class="{ active: activePage === 'attestations' }"
-                @click="$emit('navigate', 'attestations')"
+                :class="{ active: page === 'attestations' }"
             >
                 <i class="bi bi-award me-2"></i>
                 Attestations
-            </button>
+            </Link> -->
 
-            <button
-                type="button"
+            <!-- TODO: Implement reports feature -->
+            <!-- <Link
+                :href="route('institution.reports')"
                 class="list-group-item list-group-item-action"
-                :class="{ active: activePage === 'reports' }"
-                @click="$emit('navigate', 'reports')"
+                :class="{ active: page === 'reports' }"
             >
                 <i class="bi bi-bar-chart me-2"></i>
                 Reports
-            </button>
+            </Link> -->
         </div>
     </div>
 </template>
 
 <script setup>
+import { Link } from '@inertiajs/vue3';
+
 defineProps({
-    activePage: {
+    page: {
         type: String,
         default: 'dashboard'
     }
 });
-
-defineEmits(['navigate']);
 </script>
 
 <style scoped>
@@ -72,16 +69,12 @@ defineEmits(['navigate']);
     top: 80px;
 }
 
-.menu-title {
-    color: #003366;
-    font-weight: 600;
-    padding-left: 0.5rem;
-}
-
 .list-group-item {
     border-color: #dee2e6;
     transition: all 0.2s ease;
     cursor: pointer;
+    text-decoration: none;
+    color: inherit;
 }
 
 .list-group-item:not(:disabled):hover {

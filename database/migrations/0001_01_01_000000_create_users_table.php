@@ -25,8 +25,8 @@ return new class extends Migration
             $table->string('bceid_username', 60)->nullable();
             $table->uuid('idir_user_guid')->index()->nullable();
             $table->uuid('bcsc_user_guid')->index()->nullable();
-            $table->uuid('bceid_user_guid')->index()->nullable();
-            $table->uuid('bceid_business_guid')->index()->nullable();
+            $table->string('bceid_user_guid')->index()->nullable();
+            $table->string('bceid_business_guid')->index()->nullable();
             $table->uuid('last_touch_by_user_guid')->index()->nullable();
             $table->string('keycloak_id')->index()->nullable();
             $table->string('identity_provider')->index()->nullable();

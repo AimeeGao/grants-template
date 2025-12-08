@@ -3,8 +3,13 @@
 namespace Modules\Institution\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Role;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
+use App\Models\Institution;
+use Modules\Institution\Http\Requests\ProfileUpdateRequest;
 
 class InstitutionController extends Controller
 {
@@ -13,63 +18,68 @@ class InstitutionController extends Controller
      */
     public function index()
     {
-        // For now, return simple static data for the dashboard
-        // You can later replace this with actual database queries
+        $user = Auth::user();
+        $institution = $user->institution;
+        $institutionName = $institution?->name ?? $user->organization ?? 'Unknown Institution';
+
         return Inertia::render('Institution::Dashboard', [
-            'auth' => [
-                'user' => [
-                    'first_name' => 'Shareen',
-                    'last_name' => 'Prasad',
-                ]
-            ],
-            'institutionName' => 'College A Victoria',
-            'totalAttestations' => 0,
-            'reservedGradAttestations' => 0,
-            'availableAttestations' => 0,
-            'gradIssued' => 0,
-            'gradDeclined' => 0,
-            'undergradIssued' => 0,
-            'undergradDeclined' => 0,
-            'remainingUndergradAttestations' => 0,
+            'page' => 'dashboard',
+            'institutionName' => $institutionName,
         ]);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Display the institution profile page.
      */
-    public function create()
+    public function profile()
     {
-        return view('institution::create');
+        $user = Auth::user();
+        $institution = $user->institution;
+
+        return Inertia::render('Institution::Dashboard', [
+            'page' => 'profile',
+            'institution' => $institution?->toArray(),
+            'institutionName' => $institution?->name ?? $user->organization ?? 'Unknown Institution',
+            'canEdit' => $institution && $user->hasRole(Role::INSTITUTION_ADMIN),
+        ]);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Update the institution profile.
      */
-    public function store(Request $request) {}
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
+    public function updateProfile(ProfileUpdateRequest $request)
     {
-        return view('institution::show');
+        $user = Auth::user();
+        $institution = $user->institution;
+
+        if (!$institution) {
+            return Redirect::back()->withErrors([
+                'error' => 'Institution profile not found.'
+            ]);
+        }
+
+        // Get validated data (authorization is handled in ProfileUpdateRequest)
+        $validated = $request->validated();
+
+        // Update institution with validated data
+        $institution->update($validated);
+
+        return Redirect::route('institution.profile.index')->with([
+            'success' => 'Institution profile updated successfully.'
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        return view('institution::edit');
-    }
+    // TODO: Implement applications feature
+    // public function applications() {}
+    // public function viewApplication($id) {}
+    // public function reviewApplication(Request $request, $id) {}
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id) {}
+    // TODO: Implement attestations feature
+    // public function attestations() {}
+    // public function viewAttestation($id) {}
+    // public function revokeAttestation(Request $request, $id) {}
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id) {}
+    // TODO: Implement reports feature
+    // public function reports(Request $request) {}
+    // public function exportReport(Request $request, $type) {}
 }

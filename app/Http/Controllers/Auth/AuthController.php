@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Student;
 use App\Models\User;
 use App\Models\Role;
+use App\Models\Institution;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -303,14 +304,19 @@ class AuthController extends Controller
                 break;
 
             case 'bceid':
-                $user->bceid_user_guid = $providerUser['bceid_user_guid'] ?? null;
+                $user->bceid_user_guid = $this->normalizeGuid($providerUser['bceid_user_guid'] ?? null);
                 $user->bceid_username = $providerUser['bceid_username'] ?? null;
-                $user->bceid_business_guid = $providerUser['bceid_business_guid'] ?? null;
+                $user->bceid_business_guid = $this->normalizeGuid($providerUser['bceid_business_guid'] ?? null);
                 $user->organization = Str::upper($providerUser['bceid_business_name'] ?? '');
                 break;
         }
 
         $user->save();
+
+        // Auto-create institution for BCeID users
+        if ($idpType === 'bceid' && !empty($user->bceid_business_guid)) {
+            $this->ensureInstitutionExists($user->bceid_business_guid, $user->organization);
+        }
 
         // Assign default role based on IDP type
         $this->assignDefaultRole($user, $idpType);
@@ -359,6 +365,36 @@ class AuthController extends Controller
                     $user->save();
                 }
             }
+        }
+    }
+
+    /**
+     * Ensure institution record exists for BCeID business.
+     * Auto-creates institution from BCeID data during login.
+     */
+    private function ensureInstitutionExists(string $bceidBusinessGuid, string $organizationName): void
+    {
+        $institution = Institution::firstOrCreate(
+            ['bceid_business_guid' => $bceidBusinessGuid],
+            [
+                'guid' => str_replace('-', '', \Illuminate\Support\Str::uuid()),
+                'name' => $organizationName,
+                'name_code' => strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $organizationName), 0, 5)),
+                'legal_name' => $organizationName,
+                'active_status' => true,
+                'category' => 'public',
+                'province' => 'BC',
+                'city' => 'Unknown',
+                'postal_code' => 'V0V0V0',
+            ]
+        );
+
+        if ($institution->wasRecentlyCreated) {
+            Log::info('Institution auto-created from BCeID login', [
+                'institution_id' => $institution->id,
+                'bceid_business_guid' => $bceidBusinessGuid,
+                'name' => $organizationName,
+            ]);
         }
     }
 
@@ -436,5 +472,22 @@ class AuthController extends Controller
         // Default dashboard for other cases
         return redirect()->route('login')
             ->withErrors(['error' => 'Could not access dashboard. Please contact an administrator. Error #0082940']);
+    }
+
+    /**
+     * Normalize GUID format to uppercase without hyphens.
+     * This ensures consistent GUID format across all identity providers.
+     *
+     * @param string|null $guid The GUID to normalize
+     * @return string|null The normalized GUID (uppercase, no hyphens) or null
+     */
+    private function normalizeGuid(?string $guid): ?string
+    {
+        if (empty($guid)) {
+            return null;
+        }
+
+        // Remove hyphens and convert to uppercase
+        return strtoupper(str_replace('-', '', $guid));
     }
 }
